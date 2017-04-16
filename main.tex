@@ -121,7 +121,7 @@ I'm developing a query system whose performance permits real-time analysis, but 
 \begin{block}{\underline{Execution engine}}
 \vspace{-0.1 cm}
 \begin{itemize}
-\item Operate on contiguous columns of leaf data, rather than objects. Restructuring objects $\to$ changing arrays of integers.
+\item Operate on contiguous columns of data (like ``TLeaf''), not objects. Restructuring becomes changes in arrays of integers.
 \item No memory allocation at runtime, vectorizable loops.
 \item JIT-compiled. CPU target for now, but GPU is possible.
 \end{itemize}
@@ -174,7 +174,37 @@ final = pending.await()              \textcolor{gray}{# watch result accumulate}
 \vspace{-0.2 cm}
 \hfill \mbox{\includegraphics[width=0.48\linewidth]{c1.png}\hspace{-1 cm}}
 \vspace{4 cm}
+\end{frame}
 
+\begin{frame}[fragile]{Taking it apart (1/3)}
+\vspace{0.25 cm}
+\begin{itemize}
+\item Femtocode always appears in quotes (like SQL). It is a big-data aggregation step in the midst of a traditional analysis.
+
+\item A query is a ``workflow'' from source to aggregation, compiled and submitted as one unit.
+
+e.g.\ {\tt\scriptsize source("dataset").define(X).define(Y).histogrammar(Z) }
+
+\item Most Femtocode expressions are tiny (hence ``femto''), scattered throughout a Histogrammar aggregation:
+
+\scriptsize
+\begin{Verbatim}[commandchars=\\\{\}]
+session.source(\textcolor{red}{"dataset"})
+    .define(goodmuons = \textcolor{red}{"""..."""}
+    .filter(\textcolor{red}{"goodmuons.size >= 2"})
+    .define(dimuon = \textcolor{red}{"""..."""}
+    .bundle(                 \textcolor{gray}{# plot the dimuons we’ve defined}
+        mass = bin(120, 0, 12, \textcolor{red}{"dimuon.mass"}),
+        pt = bin(100, 0, 100, \textcolor{red}{"dimuon.pt"}),
+        eta = bin(100, -5, 5, \textcolor{red}{"dimuon.eta"}),
+        phi = bin(314, 0, 2*pi, \textcolor{red}{"dimuon.phi + pi"}),
+                             \textcolor{gray}{# also plot one muon per entry}
+        muons = explode(\textcolor{red}{"goodmuons"}, \textcolor{red}{"mu"}, bundle(
+            pt = bin(100, 0, 100, \textcolor{red}{"mu.pt"}),
+            eta = bin(100, -5, 5, \textcolor{red}{"mu.eta"}),
+            phi = bin(314, -pi, pi, \textcolor{red}{"mu.phi"}))))
+\end{Verbatim}
+\end{itemize}
 \end{frame}
 
 
