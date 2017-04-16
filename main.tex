@@ -385,8 +385,48 @@ All functions except \textcolor{red}{\tt \$explode*} are ideally suited to GPU a
 \end{columns}
 \end{frame}
 
-\begin{frame}{}
+\begin{frame}[fragile]{Execution engine: objects become arrays}
+\vspace{0.3 cm}
+\textcolor{darkblue}{\normalsize Muon object schema:}
 
+\scriptsize
+\begin{Verbatim}[commandchars=\\\{\}]
+\textcolor{darkgreen}{muons} = \textcolor{blue}{collection}(\textcolor{blue}{record}(
+            \textcolor{darkgreen}{pt} = \textcolor{blue}{real}(0, almost(inf)),
+            \textcolor{darkgreen}{eta} = \textcolor{blue}{real},
+            \textcolor{darkgreen}{phi} = \textcolor{blue}{real}(-pi, pi)))
+\end{Verbatim}
+
+\vspace{0.3 cm}
+\textcolor{darkblue}{\normalsize Physical representation:}
+
+\scriptsize
+\begin{minted}{python}
+data = {
+    "muons[]-pt":   [31.0960, 9.7620, 8.1769, ...,
+                       5.2730, 4.7240, 8.5879],    # (length 132274)
+    "muons[]-phi":  [-0.4814, -0.1242, -0.1185, ...,
+                       1.2469, -0.2067, -1.7541],  # (length 132274)
+    "muons[]-eta":  [0.8816, 0.9243, 0.9226, ...,
+                       -0.9911, 0.9532, -0.2635],  # (length 132274)
+    "muons[]@size": [7, 1, 4, ..., 4, 0, 1]}       # (length 48131)
+\end{minted}
+
+\vspace{0.3 cm}
+\textcolor{darkblue}{\normalsize Dimuon run produces:}
+
+\scriptsize
+\begin{Verbatim}[commandchars=\\\{\}]
+\textcolor{darkgreen}{masses} = \textcolor{blue}{collection}(\textcolor{blue}{collection}(\textcolor{blue}{union}(\textcolor{blue}{null}, \textcolor{blue}{real}(0, almost(inf)))))
+\end{Verbatim}
+
+\scriptsize
+\begin{minted}{python}
+output = {
+    "#34":          [0.2113, 6.2386, 5.7978, ...,
+                       13.1108, 0.2113, 0.2113],   # (length 584642)
+    "#11@size":     [7, 7, 7, ..., 0, 1, 1]}       # (length 180405)
+\end{minted}
 \end{frame}
 
 \end{document}
