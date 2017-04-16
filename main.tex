@@ -27,6 +27,7 @@
 \xdefinecolor{darkgrey}{rgb}{0.35,0.35,0.35}
 \xdefinecolor{darkorange}{rgb}{0.8,0.5,0}
 \xdefinecolor{darkred}{rgb}{0.7,0,0}
+\xdefinecolor{lightred}{rgb}{1,0.5,0.5}
 \xdefinecolor{dianablue}{rgb}{0.18,0.24,0.31}
 \definecolor{commentgreen}{rgb}{0,0.6,0}
 \definecolor{stringmauve}{rgb}{0.58,0,0.82}
@@ -144,7 +145,7 @@ I'm developing a query system whose performance permits real-time analysis, but 
 pending = session.source(\textcolor{red}{"ZZ_13TeV_pythia8"})
     .define(mumass = \textcolor{red}{"0.105658"})     \textcolor{gray}{# chain of operations on source}
     .toPython(mass = \textcolor{red}{"""}
-\textcolor{red}{muons.map(mu1 => muons.map(\{mu2 =>}   \textcolor{gray}{# doubly-nested loop over muons}
+\textcolor{red}{muons.map(mu1 => muons.map(\{mu2 =>}   \textcolor{gray}{# doubly nested loop over muons}
 \textcolor{red}{  p1x = mu1.pt * cos(mu1.phi);}
 \textcolor{red}{  p1y = mu1.pt * sin(mu1.phi);}       \textcolor{gray}{# shares scope with other steps}
 \textcolor{red}{  p1z = mu1.pt * sinh(mu1.eta);}      \textcolor{gray}{# in the chain (see "mumass")}
@@ -190,15 +191,15 @@ e.g.\ {\tt\scriptsize source("dataset").define(X).define(Y).histogrammar(Z) }
 \scriptsize
 \begin{Verbatim}[commandchars=\\\{\}]
 session.source(\textcolor{red}{"dataset"})
-    .define(goodmuons = \textcolor{red}{"""..."""}
-    .filter(\textcolor{red}{"goodmuons.size >= 2"})
-    .define(dimuon = \textcolor{red}{"""..."""}
-    .bundle(                 \textcolor{gray}{# plot the dimuons we’ve defined}
+    .define(goodmuons = \textcolor{red}{"""..."""})  \textcolor{gray}{# define good muons}
+    .filter(\textcolor{red}{"goodmuons.size >= 2"})  \textcolor{gray}{# cut on them}
+    .define(dimuon = \textcolor{red}{"""..."""}      \textcolor{gray}{# define dimuons}
+    .bundle(                        \textcolor{gray}{# plot their attributes}
         mass = bin(120, 0, 12, \textcolor{red}{"dimuon.mass"}),
         pt = bin(100, 0, 100, \textcolor{red}{"dimuon.pt"}),
         eta = bin(100, -5, 5, \textcolor{red}{"dimuon.eta"}),
         phi = bin(314, 0, 2*pi, \textcolor{red}{"dimuon.phi + pi"}),
-                             \textcolor{gray}{# also plot one muon per entry}
+                                    \textcolor{gray}{# also plot the muons}
         muons = explode(\textcolor{red}{"goodmuons"}, \textcolor{red}{"mu"}, bundle(
             pt = bin(100, 0, 100, \textcolor{red}{"mu.pt"}),
             eta = bin(100, -5, 5, \textcolor{red}{"mu.eta"}),
@@ -207,5 +208,173 @@ session.source(\textcolor{red}{"dataset"})
 \end{itemize}
 \end{frame}
 
+\begin{frame}[fragile]{Taking it apart (2/3)}
+\begin{itemize}
+\item Doubly nested loop by nesting functionals:
+
+{\tt\small \textcolor{red}{muons.map(mu1 => muons.map(mu2 => f(mu1, mu2)))}}
+
+is equivalent to
+
+\small
+\begin{minted}{python}
+list_of_lists = []
+for mu1 in muons:
+    list_of_numbers = []
+    for mu2 in muons:
+        list_of_numbers.append(f(mu1, mu2))
+    list_of_lists.append(list_of_numbers)
+\end{minted}
+
+\item There will someday be more convenient forms: \textcolor{red}{\tt pairs}, \textcolor{red}{\tt table}, \textcolor{red}{\tt filter}, \textcolor{red}{\tt flatten}, \textcolor{red}{\tt flatMap}, \textcolor{red}{\tt zip}, \textcolor{red}{\tt permutations}, etc.
+
+\vspace{0.2 cm}
+\textcolor{gray}{(This example would ideally use \textcolor{lightred}{\tt pairs}, to avoid double-counting, and \textcolor{lightred}{\tt flatten} to destructure the list-of-lists.)}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Taking it apart (3/3)}
+\vspace{0.2 cm}
+\begin{itemize}
+\item Type system requires domain of \textcolor{red}{\tt sqrt} to be guarded:
+
+\scriptsize
+\begin{Verbatim}[commandchars=\\\{\}]
+  \textcolor{red}{sqrt(E**2 - px**2 - py**2 - pz**2)}
+
+FemtocodeError: Function "sqrt" does not accept arguments with
+the given types:
+
+    sqrt(real)
+
+    The sqrt function can only be used on non-negative numbers.
+
+Check line:col 19:2 (pos 401):
+      sqrt(E**2 - px**2 - py**2 - pz**2)
+------^
+\end{Verbatim}
+
+\normalsize But this works:
+
+\scriptsize
+\begin{Verbatim}[commandchars=\\\{\}]
+  \textcolor{red}{if E**2 - px**2 - py**2 - pz**2 >= 0:}
+  \textcolor{red}{    sqrt(E**2 - px**2 - py**2 - pz**2)}
+  \textcolor{red}{else:}
+  \textcolor{red}{    None}
+\end{Verbatim}
+
+\normalsize
+
+\item The compiler tracks each subexpression's interval of validity: \textcolor{red}{\tt\scriptsize E**2 - px**2 - py**2 - pz**2} is limited to \mbox{{\tt\scriptsize real(min=0, max=inf)}.\hspace{-1 cm}}
+
+\vspace{0.2 cm}
+In the future, we could use SymPy to discover \mbox{this algebraically.\hspace{-1 cm}}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Another thing to notice}
+\[
+\begin{array}{ll}
+\mbox{\textcolor{red}{\tt\scriptsize muons.map(mu1 => muons.map(\{mu2 =>}} & \\
+
+\left.\renewcommand{\arraystretch}{0.7}\begin{array}{p{8 cm}}
+\mbox{\textcolor{red}{\tt\scriptsize p1x = mu1.pt * cos(mu1.phi);}} \\
+\mbox{\textcolor{red}{\tt\scriptsize p1y = mu1.pt * sin(mu1.phi);}} \\
+\mbox{\textcolor{red}{\tt\scriptsize p1z = mu1.pt * sinh(mu1.eta);}} \\
+\mbox{\textcolor{red}{\tt\scriptsize E1 = sqrt(p1x**2 + p1y**2 + p1z**2 + mumass**2);}}
+\end{array}\right\} &
+\mbox{only uses \textcolor{red}{\tt mu1}} \\
+& \\
+\left.\renewcommand{\arraystretch}{0.7}\begin{array}{p{8 cm}}
+\mbox{\textcolor{red}{\tt\scriptsize p2x = mu2.pt * cos(mu2.phi);}} \\
+\mbox{\textcolor{red}{\tt\scriptsize p2y = mu2.pt * sin(mu2.phi);}} \\
+\mbox{\textcolor{red}{\tt\scriptsize p2z = mu2.pt * sinh(mu2.eta);}} \\
+\mbox{\textcolor{red}{\tt\scriptsize E2 = sqrt(p2x**2 + p2y**2 + p2z**2 + mumass**2);}}
+\end{array}\right\} &
+\mbox{only uses \textcolor{red}{\tt mu2}} \\
+& \\
+\left.\renewcommand{\arraystretch}{0.7}\begin{array}{p{8 cm}}
+\mbox{\textcolor{red}{\tt\scriptsize px = p1x + p2x;}} \\
+\mbox{\textcolor{red}{\tt\scriptsize py = p1y + p2y;}} \\
+\mbox{\textcolor{red}{\tt\scriptsize pz = p1z + p2z;}} \\
+\mbox{\textcolor{red}{\tt\scriptsize E = E1 + E2;}} \\
+\mbox{\textcolor{red}{\tt\scriptsize }} \\
+\mbox{\textcolor{red}{\tt\scriptsize if E**2 - px**2 - py**2 - pz**2 >= 0:}} \\
+\mbox{\textcolor{red}{\tt\scriptsize \hspace{0.25 cm}sqrt(E**2 - px**2 - py**2 - pz**2)}} \\
+\mbox{\textcolor{red}{\tt\scriptsize else:}} \\
+\mbox{\textcolor{red}{\tt\scriptsize \hspace{0.25 cm}None}}
+\end{array}\right\} &
+\mbox{uses both.} \\
+\mbox{\textcolor{red}{\tt\scriptsize \}))}} & \\
+\end{array}
+\]
+\end{frame}
+
+\begin{frame}{Femtocode minimizes computation}
+In most compilers, at least one of the two stanzas would be needlessly recomputed for every {\it pair} of muons. Physicists have learned to move these expressions out of the loop, possibly at the expense of readability.
+
+\vfill
+Femtocode's compiler turns every loop over objects into vectorized functions on individual fields. A by-product of this is that the functions depending on \textcolor{red}{\tt mu1} and \textcolor{red}{\tt mu2} decouple from the functions depending on \textcolor{red}{\tt (mu1, mu2)}.
+
+\vfill
+In fact, all duplicate expressions are computed exactly once. The {\it only} reason to use assignment is for clarity.
+\end{frame}
+
+\begin{frame}[fragile]{What this expands to}
+\begin{columns}[t]
+\column{0.5\linewidth}
+\tiny
+\begin{Verbatim}[commandchars=\\\{\}]
+Sized by muons[]@size:
+    #0       := cos(muons[]-phi)
+    #1       := *(muons[]-pt, #0)
+    #2       := **(#1, 2)
+    #3       := sin(muons[]-phi)
+    #4       := *(muons[]-pt, #3)
+    #5       := **(#4, 2)
+    #6       := sinh(muons[]-eta)
+    #7       := *(muons[]-pt, #6)
+    #8       := **(#7, 2)
+    #9       := +(#2, #5, #8, 0.011164)
+    #10      := sqrt(#9)
+type(#10) == real(0.105658, almost(inf))
+
+Sized by \#11@size:
+    #11@size := $explodesize(muons[], muons[])
+    #11      := $explodedata(#10, #11@size, (muons[]))
+    #12      := $explodedata(#10, #11@size, (muons[], muons[]))
+    #13      := +(#11, #12)
+    #14      := **(#13, 2)
+    #15      := $explodedata(#1, #11@size, (muons[]))
+    #16      := $explodedata(#1, #11@size, (muons[], muons[]))
+    #17      := +(#15, #16)
+    #18      := **(#17, 2)
+    #19      := -(#14, #18)
+    #20      := $explodedata(#4, #11@size, (muons[]))
+    #21      := $explodedata(#4, #11@size, (muons[], muons[]))
+    #22      := +(#20, #21)
+    #23      := **(#22, 2)
+    #24      := -(#19, #23)
+    #25      := $explodedata(#7, #11@size, (muons[]))
+    #26      := $explodedata(#7, #11@size, (muons[], muons[]))
+\end{Verbatim}
+
+\column{0.5\linewidth}
+\tiny
+\begin{Verbatim}[commandchars=\\\{\}]
+
+    #27      := +(#25, #26)
+    #28      := **(#27, 2)
+    #29      := -(#24, #28)
+    #30      := >=(#29, 0)
+    #31      := <(#29, 0)
+    #32      := -(#24, #28)
+    #33      := sqrt(#32)
+    #34      := if(#30, #31, #33, None)
+type(#34) == union(null, real(0, almost(inf)))
+\end{Verbatim}
+\end{columns}
+\end{frame}
 
 \end{document}
