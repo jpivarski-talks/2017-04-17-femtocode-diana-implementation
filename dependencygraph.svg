@@ -429,12 +429,12 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
-     inkscape:cx="427.78651"
+     inkscape:cx="589.41092"
      inkscape:cy="345.6845"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1914"
+     inkscape:window-width="1126"
      inkscape:window-height="1027"
      inkscape:window-x="0"
      inkscape:window-y="0"
@@ -453,7 +453,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -963,12 +963,12 @@
        xml:space="preserve"
        style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans"
        x="672.07123"
-       y="458.47308"
+       y="660.34821"
        id="text5275"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          x="672.07123"
-         y="458.47308"
+         y="660.34821"
          id="tspan6380"><tspan
    style="fill:#800080"
    id="tspan4339">a</tspan>, <tspan
@@ -984,42 +984,77 @@
    id="tspan4351">f</tspan></tspan><tspan
          sodipodi:role="line"
          x="672.07123"
-         y="480.97308"
+         y="682.84821"
          id="tspan4319">are all large arrays</tspan><tspan
          sodipodi:role="line"
          x="672.07123"
-         y="503.47308"
+         y="705.34821"
          id="tspan4321" /><tspan
          sodipodi:role="line"
          x="672.07123"
-         y="525.97308"
+         y="727.84821"
          id="tspan4323"><tspan
    style="fill:#008000"
    id="tspan4337">t9</tspan> must also be a</tspan><tspan
          sodipodi:role="line"
          x="672.07123"
-         y="548.47308"
+         y="750.34821"
          id="tspan4325">large array</tspan><tspan
          sodipodi:role="line"
          x="672.07123"
-         y="570.97308"
+         y="772.84821"
          id="tspan4327" /><tspan
          sodipodi:role="line"
          x="672.07123"
-         y="593.47308"
+         y="795.34821"
          id="tspan4329">intermediate steps</tspan><tspan
          sodipodi:role="line"
          x="672.07123"
-         y="615.97308"
+         y="817.84821"
          id="tspan4331">need not be</tspan><tspan
          sodipodi:role="line"
          x="672.07123"
-         y="638.47308"
+         y="840.34821"
          id="tspan4333" /><tspan
          sodipodi:role="line"
          x="672.07123"
-         y="660.97308"
+         y="862.84821"
          id="tspan4335"
          style="fill:#808080">(⊗ is some operation)</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text3152"
+       y="374.87674"
+       x="671.95697"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans"
+       xml:space="preserve"><tspan
+         y="374.87674"
+         x="671.95697"
+         sodipodi:role="line"
+         id="tspan3160">Suppose we have</tspan><tspan
+         y="404.87674"
+         x="671.95697"
+         sodipodi:role="line"
+         id="tspan3164">this dependency</tspan><tspan
+         y="434.87674"
+         x="671.95697"
+         sodipodi:role="line"
+         id="tspan3178">graph.</tspan><tspan
+         y="464.87674"
+         x="671.95697"
+         sodipodi:role="line"
+         id="tspan3186" /><tspan
+         y="494.87671"
+         x="671.95697"
+         sodipodi:role="line"
+         id="tspan3168">We are free to</tspan><tspan
+         y="524.87671"
+         x="671.95697"
+         sodipodi:role="line"
+         id="tspan3172">choose where to</tspan><tspan
+         y="554.87671"
+         x="671.95697"
+         sodipodi:role="line"
+         id="tspan3184">put the loops.</tspan></text>
   </g>
 </svg>

@@ -469,6 +469,34 @@
          offset="1"
          style="stop-color:#ffffff;stop-opacity:1" />
     </linearGradient>
+    <marker
+       inkscape:stockid="Arrow1Mstart"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mstart-0"
+       style="overflow:visible">
+      <path
+         id="path4421-9"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(0.4,0,0,0.4,4,0)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mend-3"
+       style="overflow:visible">
+      <path
+         id="path4424-6"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         inkscape:connector-curvature="0" />
+    </marker>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -477,13 +505,13 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.979899"
+     inkscape:zoom="0.70000001"
      inkscape:cx="635.86385"
      inkscape:cy="427.29702"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1914"
+     inkscape:window-width="1126"
      inkscape:window-height="1027"
      inkscape:window-x="0"
      inkscape:window-y="0"
@@ -1017,16 +1045,16 @@
        xml:space="preserve"
        style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans"
        x="671.6499"
-       y="410.90808"
+       y="446.90808"
        id="text5275"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          x="671.6499"
-         y="410.90808"
+         y="446.90808"
          id="tspan5505">foreach i:</tspan><tspan
          sodipodi:role="line"
          x="671.6499"
-         y="433.40808"
+         y="469.40808"
          id="tspan3960">    t0 := <tspan
    style="fill:#800080"
    id="tspan4353">a[i]</tspan> ⊗ <tspan
@@ -1034,7 +1062,7 @@
    id="tspan4355">b[i]</tspan></tspan><tspan
          sodipodi:role="line"
          x="671.6499"
-         y="455.90808"
+         y="491.90808"
          id="tspan3966">    t1 := <tspan
    style="fill:#800080"
    id="tspan4357">c[i]</tspan> ⊗ <tspan
@@ -1042,7 +1070,7 @@
    id="tspan4359">d[i]</tspan></tspan><tspan
          sodipodi:role="line"
          x="671.6499"
-         y="478.40808"
+         y="514.40808"
          id="tspan3968">    t2[i] := <tspan
    style="fill:#800080"
    id="tspan4361">e[i]</tspan> ⊗ <tspan
@@ -1050,35 +1078,35 @@
    id="tspan4363">f[i]</tspan></tspan><tspan
          sodipodi:role="line"
          x="671.6499"
-         y="500.90808"
+         y="536.90808"
          id="tspan3970">    t3 := t0 ⊗ t1</tspan><tspan
          sodipodi:role="line"
          x="671.6499"
-         y="523.40808"
+         y="559.40808"
          id="tspan3972">    t4[i] := t1 ⊗ t2</tspan><tspan
          sodipodi:role="line"
          x="671.6499"
-         y="545.90808"
+         y="581.90808"
          id="tspan3974">    t6[i] := t1 ⊗ t3</tspan><tspan
          sodipodi:role="line"
          x="671.6499"
-         y="568.40808"
+         y="604.40808"
          id="tspan3962">foreach i:</tspan><tspan
          sodipodi:role="line"
          x="671.6499"
-         y="590.90808"
+         y="626.90808"
          id="tspan3976">    t5 := t4[i] ⊗ t2[i]</tspan><tspan
          sodipodi:role="line"
          x="671.6499"
-         y="613.40808"
+         y="649.40808"
          id="tspan3978">    t7 := t5 ⊗ t6</tspan><tspan
          sodipodi:role="line"
          x="671.6499"
-         y="635.90808"
+         y="671.90808"
          id="tspan3980">    t8 := t7 ⊗ t5</tspan><tspan
          sodipodi:role="line"
          x="671.6499"
-         y="658.40808"
+         y="694.40808"
          id="tspan6380"><tspan
    style="fill:#008000"
    id="tspan4365">    t9[i]</tspan> := t8 ⊗ t4</tspan></text>
@@ -1096,7 +1124,7 @@
        sodipodi:cy="763.79077"
        sodipodi:rx="52.008236"
        sodipodi:ry="32.142857"
-       d="m 552.00824,763.79077 a 52.008236,32.142857 0 1 1 -104.01648,0 52.008236,32.142857 0 1 1 104.01648,0 z"
+       d="m 552.00824,763.79077 c 0,17.75201 -23.28488,32.14286 -52.00824,32.14286 -28.72336,0 -52.00824,-14.39085 -52.00824,-32.14286 0,-17.75201 23.28488,-32.14286 52.00824,-32.14286 28.72336,0 52.00824,14.39085 52.00824,32.14286 z"
        transform="translate(55.406205,-183.77725)" />
     <text
        xml:space="preserve"
@@ -1113,5 +1141,20 @@
          x="555.61713"
          y="595.6972"
          id="tspan3099-2">t4 ⊗ t2</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text3152"
+       y="374.87674"
+       x="671.95697"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans"
+       xml:space="preserve"><tspan
+         y="374.87674"
+         x="671.95697"
+         sodipodi:role="line"
+         id="tspan4700">Or an intermediate</tspan><tspan
+         y="404.87674"
+         x="671.95697"
+         sodipodi:role="line"
+         id="tspan4704">case:</tspan></text>
   </g>
 </svg>
