@@ -767,7 +767,7 @@ Femtocode's design philosophy is to do work up-front to streamline the event loo
 \begin{itemize}
 \item \textcolor{blue}{$C_1$} is a constant, dominated by 70~ms of JIT-compilation time,
 \item \textcolor{blue}{$C_2(n_{\mbox{\scriptsize cores}})$} is the time spent managing subtasks, a complex concurrent processes affected by Amdahl's law.
-\item \textcolor{blue}{$C_3$} is the compiled and embarrassingly parallel part that executes the user's query.
+\item \textcolor{blue}{$C_3$} is the part that actually executes the user's query; it is natively compiled and embarrassingly parallel.
 \end{itemize}
 
 The order parameter in this problem is $\textcolor{red}{N_{\mbox{\scriptsize events}}}$. We get to choose $\textcolor{darkgreen}{N_{\mbox{\scriptsize subtasks}}} / \textcolor{red}{N_{\mbox{\scriptsize events}}}$ and can simply make partitions larger if the Pythonic ``data management'' part becomes an issue.
@@ -794,7 +794,7 @@ Client polls for updates and may break/reestablish connection before it's done. 
 \vspace{0.1 cm}
 Therefore, when users refresh their analysis scripts or run tutorial examples, they don't stress the computation engine.
 
-\item \textcolor{darkblue}{Subtasks are assigned to ``compute'' nodes according to a hash function on required input data.} Subtasks requiring the same input data go to the same nodes and are more likely to find it in cache.
+\item \textcolor{darkblue}{Subtasks are assigned to ``compute'' nodes based on what data they need (hash of input column names).} That way, any cached input will be local to that node.
 \end{enumerate}
 \end{frame}
 
@@ -816,12 +816,12 @@ Each circle on the diagram is a collection of identical nodes, none of which are
 \end{frame}
 
 \begin{frame}{Conclusions}
-
-Progress on three aspects of the Femtocode query server project: getting ``above water.''
+\vspace{0.3 cm}
+\mbox{Progress on all three aspects of the Femtocode query server project.\hspace{-1 cm}}
 
 \begin{itemize}
 \item \textcolor{darkblue}{Langauge/Compiler:} starting to compute meaningful quantities. Parser and type-checker are mature.
-\item \textcolor{darkblue}{Execution engine:} problem of how to compute general ``explosions'' is under control. Compiling with LLVM and even serializing functions for remote execution. Factors of several from optimal performance.
+\item \textcolor{darkblue}{Execution engine:} problem of how to compute general ``explosions'' is under control. Compiling with LLVM and even serializing compiled functions for remote execution. Factors of several from optimal performance.
 \item \textcolor{darkblue}{Distributed server:} working prototype passes data through components, returns results as it should. Have not attempted to scale up.
 \end{itemize}
 
