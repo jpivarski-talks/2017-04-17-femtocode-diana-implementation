@@ -673,62 +673,6 @@
 %% \end{enumerate}
 %% \end{frame}
 
-\begin{frame}{}
-\begin{center}
-\LARGE \textcolor{darkblue}{Distributed server}
-\end{center}
-\end{frame}
-
-\begin{frame}{Scaling up to full datasets}
-Exploratory data analysis requires human-scale time to completion: seconds at most. If a query server takes much longer than this, physicists will go back to skimming.
-
-\vfill
-\textcolor{darkblue}{Scaling estimates for one query:}
-\begin{itemize}
-\item Several dozen samples, totaling $\mathcal{O}(\mbox{10~TB})$.
-\item Every query runs over all events; a single query rarely uses as much as 1\% of the {\it columns.} \textcolor{gray}{(Popularity distribution is steep.)}
-\item Worst cases observed in early implementation: 30~ms/MB.
-\item Implies 3000 core-sec for that query: 3 seconds for 1000 cores.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Scaling up to full collaborations}
-\vspace{0.4 cm}
-\textcolor{darkblue}{What about multiple users?}
-\begin{itemize}
-\item Most analyses have significantly overlapping needs. Evidence: home-grown skimming frameworks select the same 10\% of CMS MiniAOD (Bacon, Pandas, Cms3, TreeMaker).
-\item File I/O is more expensive than processing: $\sim$40~ms/MB versus $\sim$2~ms/MB. Major gains if users {\it share} cache.
-\item 10\% of 10~TB of samples is 1~TB, which easily fits in RAM on a cluster of 1000 cores \textcolor{gray}{(hard to fit in one user's machine)}.
-\item Short-lived queries are less likely to use resources at the same time, so shortening latency also reduces contention.
-\end{itemize}
-
-\vfill
-The parameters of the final system depend on the hardware allocated for it, but improving software can steepen the performance per price.
-\end{frame}
-
-\begin{frame}{Distributed system layout}
-%% \scriptsize
-%% \begin{columns}
-%% \column{0.6\linewidth}
-%% \begin{itemize}
-%% \item {\bf client:} installed on user's machine.
-%% \item {\bf dispatch:} gateway URL, checks for results and assigns if needed.
-%% \item {\bf metaDB:} dataset descriptions, schemas.
-%% \end{itemize}
-%% \column{0.6\linewidth}
-%% \begin{itemize}
-%% \item {\bf compute:} runs execution engine.
-%% \item {\bf dataDB:} source of data, such as EOS/XRootD or blob store.
-%% \item {\bf store:} stores partial results for {\bf dispatch}.
-%% \end{itemize}
-%% \end{columns}
-
-\vspace{0.15 cm}
-\mbox{\hspace{-1.1 cm}\includegraphics[width=1.2\linewidth]{distributed-system-simplified.pdf}}
-\end{frame}
-
-
-
 %% \begin{frame}[fragile]{Using ROOT functions in Femtocode}
 %% \vspace{0.1 cm}
 %% \tiny
@@ -772,4 +716,125 @@ The parameters of the final system depend on the hardware allocated for it, but 
 %% \end{minted}
 %% \end{frame}
 
+\begin{frame}{}
+\begin{center}
+\LARGE \textcolor{darkblue}{Distributed server}
+\end{center}
+\end{frame}
+
+\begin{frame}{Scaling up to full datasets}
+Exploratory data analysis requires human-scale time to completion: seconds at most. If a query server takes much longer than this, physicists will go back to private skims.
+
+\vfill
+\textcolor{darkblue}{Scaling estimates for one query:}
+\begin{itemize}
+\item Several dozen samples, totaling $\mathcal{O}(\mbox{10~TB})$.
+\item Every query runs over all events; a single query rarely uses as much as 1\% of the {\it columns.} \textcolor{gray}{(Popularity distribution is steep.)}
+\item Worst cases observed in early implementation: 30~ms/MB.
+\item Implies 3000 core-sec for that query: 3 seconds for 1000 cores.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Scaling up to full collaborations}
+\vspace{0.4 cm}
+\textcolor{darkblue}{Scaling estimates for multiple users:}
+\begin{itemize}
+\item Most analyses have significantly overlapping needs. Evidence: home-grown skimming frameworks select the same 10\% of CMS MiniAOD (Bacon, Pandas, Cms3, TreeMaker).
+\item File I/O is more expensive than processing: $\sim$40~ms/MB versus $\sim$2~ms/MB. Everyone wins if users {\it share} cache.
+\item 10\% of 10~TB of samples is 1~TB, which easily fits in RAM on a cluster of 1000 cores \textcolor{gray}{(hard to fit on one user's machine)}.
+\item Short-lived queries are less likely to use resources at the same time, so shortening latency also reduces contention.
+\end{itemize}
+
+\vfill
+The parameters of the final system depend on the hardware allocated for it, but improving software can steepen the performance per price.
+\end{frame}
+
+\begin{frame}{Dividing the problem}
+\vspace{0.2 cm}
+Femtocode's design philosophy is to do work up-front to streamline the event loop. In the distributed server, managing subtasks is part of this up-front work. Time to completion could be summarized as
+
+\vspace{-0.2 cm}
+\[
+\mbox{time} = \textcolor{blue}{C_1} + \textcolor{blue}{C_2(n_{\mbox{\scriptsize cores}})} \cdot \textcolor{darkgreen}{N_{\mbox{\scriptsize subtasks}}}  + \frac{\textcolor{blue}{C_3}}{n_{\mbox{\scriptsize cores}}} \cdot \textcolor{red}{N_{\mbox{\scriptsize events}}}
+\]
+
+\vspace{-0.2 cm}
+\begin{itemize}
+\item \textcolor{blue}{$C_1$} is a constant, dominated by 70~ms of JIT-compilation time,
+\item \textcolor{blue}{$C_2(n_{\mbox{\scriptsize cores}})$} is the time spent managing subtasks, a complex concurrent processes affected by Amdahl's law.
+\item \textcolor{blue}{$C_3$} is the compiled and embarrassingly parallel part that executes the user's query.
+\end{itemize}
+
+The order parameter in this problem is $\textcolor{red}{N_{\mbox{\scriptsize events}}}$. We get to choose $\textcolor{darkgreen}{N_{\mbox{\scriptsize subtasks}}} / \textcolor{red}{N_{\mbox{\scriptsize events}}}$ and can simply make partitions larger if the Pythonic ``data management'' part becomes an issue.
+\end{frame}
+
+\begin{frame}{Distributed system layout}
+\vspace{0.15 cm}
+\mbox{\hspace{-1.1 cm}\includegraphics[width=1.2\linewidth]{distributed-system-tall.pdf}}
+\end{frame}
+
+\begin{frame}{Not a batch system}
+\vspace{0.5 cm}
+Although incoming jobs are scattered to compute nodes, computed in parallel, and then gathered, this differs from a batch system in important ways.
+
+\begin{enumerate}
+\item \textcolor{darkblue}{No ``job id'' or attempt to send results back to the user.}
+
+\vspace{0.1 cm}
+Identical queries on the same dataset will always yield identical results, so jobs are identified by a hash of the query itself.
+
+\vspace{0.1 cm}
+Client polls for updates and may break/reestablish connection before it's done. Dispatch checks the ``store'' for partial results, rather than re-running.
+
+\vspace{0.1 cm}
+Therefore, when users refresh their analysis scripts or run tutorial examples, they don't stress the computation engine.
+
+\item \textcolor{darkblue}{Subtasks are assigned to ``compute'' nodes according to a hash function on required input data.} Subtasks requiring the same input data go to the same nodes and are more likely to find it in cache.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{}
+\begin{center}
+\LARGE \textcolor{darkblue}{Conclusions}
+\end{center}
+\end{frame}
+
+\begin{frame}{Conclusions}
+
+
+
+\end{frame}
+
 \end{document}
+
+
+
+
+
+
+%% \scriptsize
+%% \begin{columns}
+%% \column{0.6\linewidth}
+%% \begin{itemize}
+%% \item {\bf client:} installed on user's machine.
+%% \item {\bf dispatch:} gateway URL, checks for results and assigns if needed.
+%% \item {\bf metaDB:} dataset descriptions, schemas.
+%% \end{itemize}
+%% \column{0.6\linewidth}
+%% \begin{itemize}
+%% \item {\bf compute:} runs execution engine.
+%% \item {\bf dataDB:} source of data, such as EOS/XRootD or blob store.
+%% \item {\bf store:} stores partial results for {\bf dispatch}.
+%% \end{itemize}
+%% \end{columns}
+%% \begin{frame}{Story of a query}
+%% \hfill \includegraphics[width=0.5\linewidth]{distributed-system-short.pdf}
+%% \begin{enumerate}
+%% \item {\bf Client} Femtocode-compiles a query into vectorized statements and sends it to the only exposed URL: {\bf dispatch}.
+%% \item {\bf Dispatch} checks to see if there's a result in the {\bf store}; if not, it splits the job and distributes it among {\bf compute} nodes.
+%% \item {\bf Compute} runs the Femtocode execution engine, executing subtasks on a first {\it ready}, first serve basis.
+%% \item {\bf DataDB} is the input data from the experiments, may be EOS/XRootD. {\bf Compute} nodes cache as much input data as possible to avoid making requests to {\bf dataDB}.
+%% \item {\bf Store} holds results from {\bf compute} so that {\bf dispatch} (or {\bf client}) do not need to stay alive and stateful to receive them.
+%% \item {\bf MetaDB} holds dataset descriptions and schemas. May be a part of {\bf dataDB}.
+%% \end{enumerate}
+%% \end{frame}
