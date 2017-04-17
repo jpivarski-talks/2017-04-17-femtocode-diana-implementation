@@ -200,7 +200,7 @@ session.\textcolor{blue}{source}(\textcolor{red}{"dataset"})
         \textcolor{darkgreen}{eta} = \textcolor{blue}{bin}(100, -5, 5, \textcolor{red}{"dimuon.eta"}),
         \textcolor{darkgreen}{phi} = \textcolor{blue}{bin}(314, 0, 2*pi, \textcolor{red}{"dimuon.phi + pi"}),
                                     \textcolor{gray}{# also plot the muons}
-        \textcolor{darkgreen}{muons} = \textcolor{blue}{explode}(\textcolor{red}{"goodmuons"}, \textcolor{red}{"mu"}, bundle(
+        \textcolor{darkgreen}{muons} = \textcolor{blue}{loop}(\textcolor{red}{"goodmuons"}, \textcolor{red}{"mu"}, bundle(
             \textcolor{darkgreen}{pt} = \textcolor{blue}{bin}(100, 0, 100, \textcolor{red}{"mu.pt"}),
             \textcolor{darkgreen}{eta} = \textcolor{blue}{bin}(100, -5, 5, \textcolor{red}{"mu.eta"}),
             \textcolor{darkgreen}{phi} = \textcolor{blue}{bin}(314, -pi, pi, \textcolor{red}{"mu.phi"}))))
@@ -229,7 +229,7 @@ for mu1 in muons:
 \item There will someday be more convenient forms: \textcolor{red}{\tt pairs}, \textcolor{red}{\tt table}, \textcolor{red}{\tt filter}, \textcolor{red}{\tt flatten}, \textcolor{red}{\tt flatMap}, \textcolor{red}{\tt zip}, \textcolor{red}{\tt permutations}, etc.
 
 \vspace{0.2 cm}
-\textcolor{gray}{(The dimuon example would ideally use \textcolor{lightred}{\tt pairs} to avoid double-counting and \textcolor{lightred}{\tt flatten} to destructure the list-of-lists.)}
+\textcolor{gray}{(The dimuon example would ideally use \textcolor{lightred}{\tt pairs} to avoid double-counting and \textcolor{lightred}{\tt flatten} to destructure the list-of-lists. Or better yet, pick the best two by $p_T$ to get one candidate per event.)}
 \end{itemize}
 \end{frame}
 
@@ -313,7 +313,7 @@ In the future, we could use SymPy to discover \mbox{this algebraically.\hspace{-
 \end{frame}
 
 \begin{frame}{Femtocode minimizes computation}
-In most compilers, at least one of the two stanzas would be needlessly recomputed for every {\it pair} of muons. Physicists have learned to move these expressions out of the loop, possibly at the expense of readability.
+In most compilers, at least one of those two stanzas would be needlessly recomputed for every {\it pair} of muons. Physicists have learned to move these expressions out of the loop, possibly at the expense of readability.
 
 \vfill
 Femtocode's compiler turns every loop over objects into vectorized functions on individual fields. A by-product of this is that the functions depending on just \textcolor{red}{\tt mu1} or \textcolor{red}{\tt mu2} decouple from the functions depending on both.
@@ -625,11 +625,11 @@ while entry < numEntries:  # master loop
 \textcolor{red}{\tt muons.map(mu1 => muons.map(mu2 => ...))}
 \end{center}
 \item Open question: would a version of this using recursion, rather than a single loop with stacks, be faster?
-\item Generated as Python code (previous page), compiled by Numba/LLVM into native machine code.
+\item Generated as Python code (previous page), compiled by Numba/LLVM into native machine code. \textcolor{gray}{(Easier to test.)}
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Why use size arrays instead of structs?}
+\begin{frame}{Why size arrays instead of runtime objects?}
 \vspace{0.4 cm}
 \begin{enumerate}\setlength{\itemsep}{0.2 cm}
 \item To help LLVM and the hardware optimize memory bandwidth.
@@ -652,10 +652,10 @@ while entry < numEntries:  # master loop
 
 \textcolor{gray}{(Note: Femtocode needs to be optimized to resemble no-frills loop in C. There's work to be done here.)}
 
-\item<2-> With no event boundaries in the data arrays, the body of these loops perfectly match criteria for GPU acceleration.
+\item<2-> With no event boundaries in the data arrays, the ``flat functions'' perfectly satisfy the criteria for GPU acceleration.
 
 \vspace{0.1 cm}
-\textcolor{gray}{High-level code on physics objects would automatically translate to optimized GPU kernels.}
+\textcolor{gray}{Thus, we could automatically translate high-level code on physics objects into well-optimized GPU kernels!}
 \end{enumerate}
 \end{frame}
 
